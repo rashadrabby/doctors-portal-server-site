@@ -34,9 +34,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Hello Doctors portal!')
+    res.send('Doctors portal!')
 })
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
+    console.log(`Port ${port}`)
 })
