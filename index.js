@@ -25,21 +25,27 @@ async function run() {
             res.send(services);
         });
 
+        // Warning: This is not the proper way to query multiple collection. 
+        // After learning more about mongodb. use aggregate, lookup, pipeline, match, group
         app.get('/available', async (req, res) => {
             const date = req.query.date || 'May 20, 2022'
 
             //Step 1: get all services
             const services = await serviceCollection.find().toArray();
 
-            //Step 2: get the booking of that day
+            //Step 2: get the booking of that day. Output[{},{},{}]
             const query = { date: date };
             const bookings = await bookingCollection.find(query).toArray();
 
-            //Step 3: for each service, find bookings for that service
+            //Step 3: for each service
             services.forEach(service => {
-                const serviceBookings = bookings.filter(b => b.treatment === service.name);
-                const booked = serviceBookings.map(s => s.slot);
-                const available = service.slots.filter(s => !booked.includes(s));
+                //Step 4: find bookings for that service. Output[{},{},{}]
+                const serviceBookings = bookings.filter(book => book.treatment === service.name);
+                //Step 5: select slots for service Bookings: ['','','','']
+                const booked = serviceBookings.map(service => service.slot);
+                //Step 6: select those slots that are not include in bookedSlots
+                const available = service.slots.filter(slot => !booked.includes(slot));
+                //step 7: set available to slots to make it easier 
                 service.available = available;
             })
 
