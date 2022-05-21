@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express()
 const { MongoClient, ServerApiVersion, MongoRuntimeError } = require('mongodb');
@@ -32,11 +33,12 @@ async function run() {
             const user = req.body;
             const filter = { email: email };
             const options = { upsert: true };
-            const updateDoc = { 
-                $set: user, 
+            const updateDoc = {
+                $set: user,
             };
             const result = await userCollection.updateOne(filter, updateDoc, options);
-            res.send({result});
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
+            res.send({ result, token });
         });
 
         // Warning: This is not the proper way to query multiple collection. 
